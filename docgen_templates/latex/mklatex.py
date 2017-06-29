@@ -3,6 +3,7 @@
 import re
 import sys
 import html
+from datetime import datetime
 
 # Copyright (C) 2017 Association of Universities for Research in Astronomy
 
@@ -130,6 +131,18 @@ with open(sys.argv[1], "r") as fh:
 
         # HTML Entity replacement
         line = html.unescape(line)
+
+        # Look for \date{} in case we need to parse and fix up the
+        # date coming out of MagicDraw
+        # Current format is: \date{Thu Jun 29 07:36:33 MST 2017}
+        # We want YYYY-MM-DD
+        # Can remove this code when MagicDraw can format dates
+        m = re.match(r"\\date{(.*)}", line)
+        if m is not None:
+            date = m.group(1)
+            if not re.match("\d\d\d\d-\d\d-\d\d", date):
+                d = datetime.strptime(date, "%a %b %d %H:%M:%S %Z %Y")
+                line = r"\date{{{}}}".format(d.strftime("%Y-%m-%d"))
 
         # Quick search for URLs. Do not need to do anything fancy
         # until we find we do. We do not handle <a> tags.

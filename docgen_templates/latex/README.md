@@ -11,7 +11,6 @@ The `metadata.tex` file should contain the following definitions:
 ```latex
 \title{The title}
 \author{All the authors}
-\date{\today}
 \setDocRef{LSE-nnn}
 \setDocChangeRecord{%
 ...
@@ -21,6 +20,9 @@ The `metadata.tex` file should contain the following definitions:
 ## Notes
 
 * The title is not obtained from the SysML model at this time.
+  This is because the title includes the document handle.
+  In future the Python code may extract the handle from the title and remove the need for `\setDocRef` and `\title` in the metadata file.
+* The date will be inserted automatically from the model version history.
 * An attempt is made to detect mentions of other documents.
   These will be added as citations.
 * Mentions of requirements will be replaced with internal links to the requirement in the current document.

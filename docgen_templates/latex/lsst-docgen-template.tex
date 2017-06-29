@@ -21,7 +21,14 @@
 
 \setcounter{secnumdepth}{5}
 
-%% Define the document title, authors, date and change record
+%% Retrieve date and model version
+\setDocUpstreamLocation{MagicDraw SysML}
+\setDocUpstreamVersion{$project.getVersion()}
+
+#set($versions = $project.getVersionList())
+\date{$versions[0].date}
+
+%% Define the document title, authors, handle, and change record
 \input metadata.tex
 
 % Environment for displaying the parameter tables in
