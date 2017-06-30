@@ -73,8 +73,15 @@ $element.documentation
 #parseHeader($element.name,$depth)
 #if(!$report.getStereotypeProperty($element,"Requirement","Id").isEmpty())
 
-\label{$report.getStereotypeProperty($element,"Requirement","Id").get(0)}
-\textbf{ID:} $report.getStereotypeProperty($element,"Requirement","Id").get(0)
+#set( $reqid = $report.getStereotypeProperty($element,"Requirement","Id").get(0))
+\label{$reqid}
+## Duplicate ID writing so that the output has ID and priority on same line of output
+## Makes it easier to filter the output tex file
+#if($report.getStereotypeProperty($element,"DM_Req_Priority","Priority").isEmpty())
+\textbf{ID:} $reqid
+#else
+\textbf{ID:} $reqid (Priority: $report.getStereotypeProperty($element,"DM_Req_Priority","Priority").get(0).name)
+#end
 
 #end
 #if(!$report.getStereotypeProperty($element,"Requirement","Text").isEmpty())
