@@ -29,6 +29,7 @@ $sysmlProfile = StereotypesHelper.getProfile($project,'SysML');
 
 $sysmlRequirementStereotype = StereotypesHelper.getStereotype($project,'Requirement',$sysmlProfile);
 $sysmlInterfaceRequirementStereotype = StereotypesHelper.getStereotype($project,'interfaceRequirement',$sysmlProfile);
+$lsstPriortizedRequirementStereotype = StereotypesHelper.getStereotype($project,'DM_Req_Priority',$lsstProfile);
 
 $vpeStereotype = StereotypesHelper.getStereotype($project,'VerificationElement',$lsstProfile);
 $uniqueIDStubHolderStereotype = StereotypesHelper.getStereotype($project,'UniqueIDStubHolder',$lsstProfile);
@@ -46,7 +47,7 @@ $unmarkedRequirements = java.util.ArrayList.new;
 ##
 
 def getLatestIds(element)
-	if((StereotypesHelper.hasStereotype(element,$sysmlRequirementStereotype) or StereotypesHelper.hasStereotype(element,$sysmlInterfaceRequirementStereotype)) and !StereotypesHelper.hasStereotype(element,$vpeStereotype))
+	if((StereotypesHelper.hasStereotype(element,$sysmlRequirementStereotype) or StereotypesHelper.hasStereotype(element,$sysmlInterfaceRequirementStereotype) or StereotypesHelper.hasStereotype(element,$lsstPriortizedRequirementStereotype)) and !StereotypesHelper.hasStereotype(element,$vpeStereotype))
 		if(!StereotypesHelper.getStereotypePropertyValue(element,$sysmlRequirementStereotype,'Id').isEmpty())
 			id = StereotypesHelper.getStereotypePropertyValue(element,$sysmlRequirementStereotype,'Id').get(0);
 			pre = parsePrefix(id);
