@@ -26,7 +26,7 @@ $root = $project.getPrimaryModel();
 
 $lsstProfile = StereotypesHelper.getProfile($project,'LSST Profile');
 $sysmlProfile = StereotypesHelper.getProfile($project,'SysML');
-                                                                                  
+
 $sysmlRequirementStereotype = StereotypesHelper.getStereotype($project,'Requirement',$sysmlProfile);
 $sysmlInterfaceRequirementStereotype = StereotypesHelper.getStereotype($project,'interfaceRequirement',$sysmlProfile);
 
@@ -72,6 +72,7 @@ end
 def findMissingIds(element)
 	if((StereotypesHelper.hasStereotype(element,$sysmlRequirementStereotype) or StereotypesHelper.hasStereotype(element,$sysmlInterfaceRequirementStereotype)) and !StereotypesHelper.hasStereotype(element,$vpeStereotype))
 		if(StereotypesHelper.getStereotypePropertyValue(element,$sysmlRequirementStereotype,'Id').isEmpty() or StereotypesHelper.getStereotypePropertyValue(element,$sysmlRequirementStereotype,'Id').get(0) == '')
+			Application.getInstance().getGUILog().log("Unallocated:" + element.getName());
 			$unmarkedRequirements.add(element);
 		end
 	end
@@ -140,6 +141,7 @@ def fixId(element,req)
 		localId = StereotypesHelper.getStereotypePropertyValue(element.getOwner(),$uniqueIDStubHolderStereotype,'uniqueIDStub').get(0).strip;
 		if(parsePrefix(localId) == localId)
 			nextId = $lastRequirements.get(localId) + 1;
+			Application.getInstance().getGUILog().log("Assigning " + localId + " " + nextId.to_s + " to '" + req.getName() + "'");
 			if(nextId<10)
 				StereotypesHelper.setStereotypePropertyValue(req,$sysmlRequirementStereotype,'Id',(localId.to_s + '-000' + nextId.to_s));
 			elsif(nextId<100)
@@ -165,7 +167,7 @@ end
 ##
 
 begin
-	SessionManager.getInstance().createSession("Populate_Requirement_Ids"); 
+	SessionManager.getInstance().createSession("Populate_Requirement_Ids");
 
 	$selectedNode = Application.getInstance().getProject().getBrowser().getContainmentTree().getSelectedNode().getUserObject();
 
