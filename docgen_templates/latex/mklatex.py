@@ -41,6 +41,7 @@ with open(sys.argv[1], "r") as fh:
     in_table = False
     in_list = False
     stripping = False
+    reqid_root = None
     for line in fh.readlines():
         # Remove html pre wrappers. They can be ignored
         line = re.sub(r"<html><pre>", "", line)
@@ -141,11 +142,22 @@ with open(sys.argv[1], "r") as fh:
         if not re.search(r"(setDocRef|addtohist)", line):
             line = re.sub(r"(L[PDTS]\w\-\d+)", r"\\citeds{\1}", line)
 
-        # Use hyperlinks when mentioning DMS requirements from other
-        # requirements
-        if re.search(r"DMS-REQ", line) and not re.match(r"\\label{DMS", line) \
-                and not re.search(r"ID:.*DMS-REQ", line):
-            line = re.sub(r"(DMS-REQ-\d\d\d\d)", r"\\hyperref[\1]{\1}", line)
+        # To be generically useful, we have to work out what requirement
+        # ID root is being used in this document
+        if reqid_root is None:
+            root_match = re.search("label{(.*-REQ)-\d+}", line)
+            if root_match:
+                reqid_root = root_match.group(1)
+                print("Using requirement prefix {}".format(reqid_root),
+                      file=sys.stderr)
+
+        # Use hyperlinks when mentioning requirements from other
+        # requirements within the same document
+        if reqid_root is not None and re.search(reqid_root, line) and \
+            not re.match(r"\\label{" + reqid_root, line) and \
+                not re.search(r"ID:.*" + reqid_root, line):
+            line = re.sub(r"({}-\d\d\d\d)".format(reqid_root),
+                          r"\\hyperref[\1]{\1}", line)
 
         # Now that the line is fixed up, look for list
         if re.match(r"\s*\* ", line):
