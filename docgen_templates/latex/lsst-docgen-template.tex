@@ -68,6 +68,7 @@ $scopedPackage.documentation
 #macro( recursiveReqs $element $depth)
 #if($element.getHumanType() == 'Package')
 #parseHeader($element.name,$depth)
+
 $element.documentation
 #elseif(($report.containsStereotype($element,"Requirement") || $report.containsStereotype($element,"interfaceRequirement")) && !$report.containsStereotype($element,"VerificationElement"))
 #parseHeader($element.name,$depth)
