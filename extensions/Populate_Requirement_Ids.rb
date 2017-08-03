@@ -139,7 +139,11 @@ def fixId(element,req)
 	elsif(!StereotypesHelper.getStereotypePropertyValue(element.getOwner(),$uniqueIDStubHolderStereotype,'uniqueIDStub').isEmpty())
 		localId = StereotypesHelper.getStereotypePropertyValue(element.getOwner(),$uniqueIDStubHolderStereotype,'uniqueIDStub').get(0).strip;
 		if(parsePrefix(localId) == localId)
-			nextId = $lastRequirements.get(localId) + 1;
+			if($lastRequirements.get(localId) == nil)
+				nextId = 1;
+			else
+				nextId = $lastRequirements.get(localId) + 1;
+			end
 			if(nextId<10)
 				StereotypesHelper.setStereotypePropertyValue(req,$sysmlRequirementStereotype,'Id',(localId.to_s + '-000' + nextId.to_s));
 			elsif(nextId<100)

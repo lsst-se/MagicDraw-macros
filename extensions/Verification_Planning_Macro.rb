@@ -7,6 +7,7 @@ require 'java'
 Application = com.nomagic.magicdraw.core.Application
 StereotypesHelper = com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper
 ModelHelper = com.nomagic.uml2.ext.jmi.helpers.ModelHelper
+SessionManager = com.nomagic.magicdraw.openapi.uml.SessionManager
 
 ##
 #The following section sets the $project, $elementsFactory, and $root variables
@@ -53,7 +54,7 @@ def recursiveTreeTraversal(element)
 				for enum in enumList
 					findOrCreateVPE(element,StereotypesHelper.getStereotypePropertyValue(element,$sysmlRequirementStereotype,'Id').get(0).to_s + '-V-' + enum.getName());
 				end
-				findOrCreateVPE(element,StereotypesHelper.getStereotypePropertyValue(element,$sysmlRequirementStereotype,'Id').get(0).to_s + '-V-PSE');
+				findOrCreateVPE(element,StereotypesHelper.getStereotypePropertyValue(element,$sysmlRequirementStereotype,'Id').get(0).to_s + '-V');
 			end
 		elsif(StereotypesHelper.hasStereotype(element,$sysmlRequirementStereotype) and !StereotypesHelper.hasStereotype(element,$vpeStereotype))
 			findOrCreateVPE(element,StereotypesHelper.getStereotypePropertyValue(element,$sysmlRequirementStereotype,'Id').get(0).to_s + '-V');
@@ -72,7 +73,7 @@ end
 
 def findOrCreateVPE(requirement,targetId)
 	for relation in requirement.get_relationshipOfRelatedElement()
-		if(StereotypesHelper.hasStereotype(relation,$vpeRelationshipStereotype) and StereotypesHelper.getStereotypePropertyValue(relation.getSource().get(0),$sysmlRequirementStereotype,'Id').get(0) == targetId)
+		if(StereotypesHelper.hasStereotype(relation,$vpeRelationshipStereotype) and StereotypesHelper.getStereotypePropertyValue(relation.getSource().get(0),$vpeStereotype,'VE ID').get(0) == targetId)
 			return;
 		end
 	end
@@ -80,7 +81,7 @@ def findOrCreateVPE(requirement,targetId)
 	newVPE = $elementsFactory.createClassInstance();
 	StereotypesHelper.addStereotype(newVPE,$vpeStereotype);
 	newVPE.setName(requirement.getName());
-	StereotypesHelper.setStereotypePropertyValue(newVPE,$sysmlRequirementStereotype,'Id',targetId);
+	StereotypesHelper.setStereotypePropertyValue(newVPE,$vpeStereotype,'VE ID',targetId);
 	newVPE.setOwner(requirement.getOwner());
 
 	newRelation = $elementsFactory.createAbstractionInstance();
