@@ -1,0 +1,204 @@
+\documentclass[SE,toc,lsstdraft]{lsstdoc}
+
+## This is a template file that can be used to generate LaTeX documents
+## from within MagicDraw. It uses the standard lsstdoc LaTeX classes
+
+## Template author: Tim Jenness
+
+## When importing updates in the VTL from the Word template unicode quotes
+## (single and double) must be converted to simple quotes.
+
+## After the document has been generated, it will be neccessary to run
+## the fixup.py script to ensure that the embedded HTML and list directives
+## are handled properly in the LaTeX.
+
+% We use commands to make it easy to find where parameter names and units
+% are defined in the tables, and to allow hyphenation.
+\newcommand{\paramname}[1]{\hspace{0pt}#1}
+\newcommand{\unitname}[1]{\hspace{0pt}#1}
+
+#set($scopedPackage = $packageScope.get(0))
+
+\setcounter{secnumdepth}{5}
+
+%% Retrieve date and model version
+\setDocUpstreamLocation{MagicDraw SysML}
+\setDocUpstreamVersion{$project.getVersion()}
+
+#set($versions = $project.getVersionList())
+\date{$date.format('yyyy-MM-dd', $versions[0].date)}
+
+%% Define the document title, authors, handle, and change record
+\input metadata.tex
+
+% Environment for displaying the parameter tables in
+% a consistent manner. No arguments as there are no
+% captions or labels.
+\newenvironment{parameters}[0]{%
+\setlength\LTleft{0pt}
+\setlength\LTright{\fill}
+\begin{small}
+\begin{longtable}[]{|p{0.49\textwidth}|l|p{0.6in}|p{1.70in}@{}|}
+
+\hline \textbf{Description} & \textbf{Value} & \textbf{Unit} & \textbf{Name} \\ \hline
+\endhead
+
+\hline \multicolumn{4}{r}{\emph{Continued on next page}} \\
+\endfoot
+
+\hline\hline
+\endlastfoot
+}{%
+\hline
+\end{longtable}
+\end{small}
+}
+
+
+
+\begin{document}
+\maketitle
+
+$scopedPackage.documentation
+#foreach($child in $sorter.sort($scopedPackage.getOwnedElement()))
+#if($report.containsStereotype($child,"Requirement") || $report.containsStereotype($child,"interfaceRequirement") || $child.getHumanType() == 'Package')
+#recursiveReqs($child,1)
+#end
+#end
+#macro( recursiveReqs $element $depth)
+#if($element.getHumanType() == 'Package')
+#parseHeader($element.name,$depth)
+
+$element.documentation
+#elseif(($report.containsStereotype($element,"Requirement") || $report.containsStereotype($element,"interfaceRequirement")) && !$report.containsStereotype($element,"VerificationElement"))
+#parseHeader($element.name,$depth)
+#if(!$report.getStereotypeProperty($element,"Requirement","Id").isEmpty())
+
+#set( $reqid = $report.getStereotypeProperty($element,"Requirement","Id").get(0))
+\label{$reqid}
+## Duplicate ID writing so that the output has ID and priority on same line of output
+## Makes it easier to filter the output tex file
+#if($report.getStereotypeProperty($element,"DM_Req_Priority","Priority").isEmpty())
+\textbf{ID:} $reqid
+#else
+\textbf{ID:} $reqid (Priority: $report.getStereotypeProperty($element,"DM_Req_Priority","Priority").get(0).name)
+#end
+
+#end
+#if(!$report.getStereotypeProperty($element,"Requirement","Text").isEmpty())
+#writeReqText($report.getStereotypeProperty($element,"Requirement","Text").get(0), "Specification:")
+#end
+
+#writeReqText($element.documentation, "Discussion:")
+#end
+
+#set($refines = $array.createArray())
+#foreach($subRelation in $element.get_directedRelationshipOfTarget())
+#if($report.containsStereotype($subRelation,"Refine"))
+#set($filler = $refines.add($subRelation))
+#end
+#end
+#if(!$refines.isEmpty())
+
+## Note that forrow seems to be a MagicDraw extension that is designed
+## specifically for Word tables. When syncing these VTL macros from the
+## Word reference remember to replace forrow with foreach.
+
+\begin{parameters}
+#foreach($refine in $refines)
+$refine.getSource().get(0).documentation
+&
+#set($length = $refine.getSource().get(0).name.length() + 3)
+$refine.getSource().get(0).get_constraintOfConstrainedElement().get(0).getSpecification().getBody().get(0).substring($length)
+&
+\unitname{%
+$refine.getSource().get(0).unit.name
+}
+&
+\paramname{%
+$refine.getSource().get(0).name
+} \\\hline
+#end
+\end{parameters}
+
+#end
+
+## Get requirements from which this requirement is derived.
+
+#set($derives = $array.createArray())
+#foreach($subRelation in $element.get_directedRelationshipOfSource())
+#if($report.containsStereotype($subRelation,"DeriveReqt"))
+#set($filler = $derives.add($subRelation))
+#end
+#end
+#if(!$derives.isEmpty())
+
+\emph{Derived from Requirements:}
+
+#foreach($derive in $derives)
+#set($dername = $derive.getTarget().get(0).name)
+#if(!$dername.isEmpty())
+$report.getStereotypeProperty($derive.getTarget().get(0),"Requirement","Id").get(0):
+$derive.getTarget().get(0).name \newline
+#end
+#end
+
+#end
+
+#foreach($subElement in $element.getOwnedElement())
+#if($report.containsStereotype($subElement,"Requirement") || $report.containsStereotype($subElement,"interfaceRequirement") || $subElement.getHumanType() == 'Package')
+#set($depth = $depth + 1)
+#recursiveReqs($subElement,$depth)
+#set($depth = $depth - 1)
+#end
+#end
+#end
+#macro( properHeading $string $depth)
+#if($depth == 1)
+\section{$string}
+#elseif($depth == 2)
+\subsection{$string}
+#elseif($depth == 3)
+\subsubsection{$string}
+#elseif($depth == 4)
+\paragraph{$string}\hfill  % Force subsequent text onto new line
+#elseif($depth == 5)
+\subparagraph{$string}\hfill  % Force subsequent text onto new line
+#elseif($depth == 6)
+\textsc{$string}
+
+#elseif($depth == 7)
+\textbf{\textit{$string}}
+
+#elseif($depth == 8)
+\textit{$string}
+
+#else
+$string
+
+#end
+#end
+## This could all be done in the python fixup script rather than in VTL
+#macro( parseHeader $header $depth)
+#if($header.charAt(0)=='0' || $header.charAt(0)=='1' || $header.charAt(0)=='2' || $header.charAt(0)=='3' || $header.charAt(0)=='4' || $header.charAt(0)=='5' || $header.charAt(0)=='6' || $header.charAt(0)=='7' || $header.charAt(0)=='8' || $header.charAt(0)=='9')
+#properHeading($header.substring($header.indexOf(" ")),$depth)
+#else
+#properHeading($header,$depth)
+#end
+#end
+
+## See if the supplied substring exists within the supplied text. If it does
+## not then write it out ourselves. Then write the element text.
+#macro( writeReqText $text $substring)
+#if(!$text.isEmpty())
+#set ($index = $text.indexOf($substring))
+#if($index < 0)
+\textbf{$substring}
+#end
+$text
+#end
+#end
+
+\bibliography{lsst}
+
+\end{document}
