@@ -1,3 +1,7 @@
+##
+#This macro was written to parse the HTML from requirements specifications and fix those with Requirement as the header.
+##
+
 require 'java'
 
 Application = com.nomagic.magicdraw.core.Application
@@ -16,15 +20,15 @@ def recursiveEASearch(element)
 	if(StereotypesHelper.hasStereotype(element,$sysmlInterfaceRequirementStereotype) or StereotypesHelper.hasStereotype(element,$sysmlRequirementStereotype))
 		
 		comment = ModelHelper.getComment(element);
-		if(comment.index('<b>Specification') == nil)
+		if(comment.index('<b>Requirement') == nil)
 			ModelHelper.setComment(element,comment);
 			StereotypesHelper.setStereotypePropertyValue(element,$sysmlRequirementStereotype,'Text','');
 		elsif(comment.index('<b>Discussion') == nil)
 			StereotypesHelper.setStereotypePropertyValue(element,$sysmlRequirementStereotype,'Text',comment);
 			ModelHelper.setComment(element,'');
 		else
-			StereotypesHelper.setStereotypePropertyValue(element,$sysmlRequirementStereotype,'Text','<html><pre>' + comment[comment.index('<b>Specification')..(comment.index('<b>Discussion')-1)].strip + '</pre></html>');
-			ModelHelper.setComment(element,comment.gsub(comment[comment.index('<b>Specification')..(comment.index('<b>Discussion')-1)],''));
+			StereotypesHelper.setStereotypePropertyValue(element,$sysmlRequirementStereotype,'Text','<html><pre>' + comment[comment.index('<b>Requirement')..(comment.index('<b>Discussion')-1)].strip + '</pre></html>');
+			ModelHelper.setComment(element,comment.gsub(comment[comment.index('<b>Requirement')..(comment.index('<b>Discussion')-1)],''));
 		end
 	end
 	for child in element.getOwnedElement()

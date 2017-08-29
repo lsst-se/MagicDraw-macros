@@ -1,4 +1,4 @@
 Data Fixing Scripts
 ===================
 
-``Spec_HTML_Fix.rb``:
+``NoMagic``: Scripts provided by NoMagic during model transition.
