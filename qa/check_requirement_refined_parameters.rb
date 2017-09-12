@@ -16,7 +16,6 @@ $lsstProfile = StereotypesHelper.getProfile($project, 'LSST Profile');
 
 $requirementStereotype = StereotypesHelper.getStereotype($project, 'Requirement', $sysmlProfile);
 $refineStereotype = StereotypesHelper.getStereotype($project, 'Refine', $sysmlProfile)
-$cbStereotype = StereotypesHelper.getStereotype($project, 'ConstraintBlock', $sysmlProfile)
 $ceStereotype = StereotypesHelper.getStereotype($project, 'ConstraintElement', $lsstProfile);
 
 # This function finds refining parameters via ConstraintBlocks/ConstraintElements 
@@ -27,7 +26,7 @@ def findRefinedParameters(requirement)
     for relation in requirement.get_relationshipOfRelatedElement()
         if StereotypesHelper.hasStereotype(relation, $refineStereotype)
             ce = ModelHelper.getClientElement(relation)
-            if StereotypesHelper.hasStereotype(ce, $ceStereotype) and StereotypesHelper.hasStereotype(ce, $cbStereotype)
+            if StereotypesHelper.hasStereotype(ce, $ceStereotype)
                 badval = false
                 constraint = ce.get_constraintOfConstrainedElement().get(0)
                 expression = constraint.getSpecification().getBody().get(0)
@@ -47,6 +46,8 @@ def findRefinedParameters(requirement)
                     end
                     $logger.log("Requirement Id: " + requirementId.to_s)
                 end
+            else
+                $logger.log(ce.getName())
             end
         end
     end
