@@ -34,7 +34,7 @@ LaTeX template file to allow it to work with LaTeX.
 """
 
 # Common regexes
-
+MATCH_BIBCODE = re.compile(r"(\d{4}[A-Za-z\.\&]{5}[\d\.]{4}[ELPQ-Z\.g][\d\.]{4}[A-Z\.])")
 
 # Read in the specified file and write the updated version to standard out
 with open(sys.argv[1], "r") as fh:
@@ -141,6 +141,12 @@ with open(sys.argv[1], "r") as fh:
         # but not if this is defining the document handle itself
         if not re.search(r"(setDocRef|addtohist)", line):
             line = re.sub(r"(L[PDTS]\w\-\d+)", r"\\citeds{\1}", line)
+
+        # Look for ADS bibcodes and turn them into citations
+        hasbib = MATCH_BIBCODE.search(line)
+        if hasbib:
+            bibcode = hasbib.group(1)
+            line = line.replace(bibcode, r"\citep{" + bibcode + "}")
 
         # To be generically useful, we have to work out what requirement
         # ID root is being used in this document
