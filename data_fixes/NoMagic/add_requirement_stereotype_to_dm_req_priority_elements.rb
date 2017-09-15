@@ -9,27 +9,27 @@ SessionManager = com.nomagic.magicdraw.openapi.uml.SessionManager
 StereotypesHelper = com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper
 ModelHelper = com.nomagic.uml2.ext.jmi.helpers.ModelHelper
 
-$project = Application.getInstance().getProject();
+$project = Application.getInstance().getProject()
 
-$sysmlProfile = StereotypesHelper.getProfile($project,'SysML');
-$lsstProfile = StereotypesHelper.getProfile($project,'LSST Profile');
+$sysmlProfile = StereotypesHelper.getProfile($project,'SysML')
+$lsstProfile = StereotypesHelper.getProfile($project,'LSST Profile')
 
-$sysmlRequirementStereotype = StereotypesHelper.getStereotype($project,'Requirement',$sysmlProfile);
-$lsstDM_Req_PriorityStereotype = StereotypesHelper.getStereotype($project,'DM_Req_Priority',$lsstProfile);
+$sysmlRequirementStereotype = StereotypesHelper.getStereotype($project,'Requirement',$sysmlProfile)
+$lsstDM_Req_PriorityStereotype = StereotypesHelper.getStereotype($project,'DM_Req_Priority',$lsstProfile)
 
 def recursiveEASearch(element)
 	if(StereotypesHelper.hasStereotype(element,$lsstDM_Req_PriorityStereotype))
-		StereotypesHelper.addStereotype(element,$sysmlRequirementStereotype);
+		StereotypesHelper.addStereotype(element,$sysmlRequirementStereotype)
 	end
 	for child in element.getOwnedElement()
-    	recursiveEASearch(child);
+    	recursiveEASearch(child)
 	end
 end
 
 begin
-	SessionManager.getInstance().createSession("Fix Requirements"); 
+	SessionManager.getInstance().createSession("Fix Requirements") 
 
-	recursiveEASearch($project.getPrimaryModel());
+	recursiveEASearch($project.getPrimaryModel())
 ensure
-	SessionManager.getInstance().closeSession();
+	SessionManager.getInstance().closeSession()
 end

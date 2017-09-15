@@ -8,28 +8,28 @@ Application = com.nomagic.magicdraw.core.Application
 SessionManager = com.nomagic.magicdraw.openapi.uml.SessionManager
 ModelHelper = com.nomagic.uml2.ext.jmi.helpers.ModelHelper
 
-$project = Application.getInstance().getProject();
+$project = Application.getInstance().getProject()
 
-$sysmlProfile = StereotypesHelper.getProfile($project,'SysML');
-$lsstProfile = StereotypesHelper.getProfile($project,'LSST Profile');
+$sysmlProfile = StereotypesHelper.getProfile($project,'SysML')
+$lsstProfile = StereotypesHelper.getProfile($project,'LSST Profile')
 
-$sysmlConstraintBlockStereotype = StereotypesHelper.getStereotype($project,'ConstraintBlock',$sysmlProfile);
-$sysmlConstraintElementStereotype = StereotypesHelper.getStereotype($project,'ConstraintElement',$lsstProfile);
+$sysmlConstraintBlockStereotype = StereotypesHelper.getStereotype($project,'ConstraintBlock',$sysmlProfile)
+$sysmlConstraintElementStereotype = StereotypesHelper.getStereotype($project,'ConstraintElement',$lsstProfile)
 
 def recursiveEASearch(element)
 	if(StereotypesHelper.hasStereotype(element,$sysmlConstraintBlockStereotype) or StereotypesHelper.hasStereotype(element,$sysmlConstraintElementStereotype))
-		StereotypesHelper.addStereotype(element,$sysmlConstraintBlockStereotype);
-		StereotypesHelper.addStereotype(element,$sysmlConstraintElementStereotype);
+		StereotypesHelper.addStereotype(element,$sysmlConstraintBlockStereotype)
+		StereotypesHelper.addStereotype(element,$sysmlConstraintElementStereotype)
 	end
 	for child in element.getOwnedElement()
-    	recursiveEASearch(child);
+    	recursiveEASearch(child)
 	end
 end
 
 begin
-	SessionManager.getInstance().createSession("Fix ConstraintBlocks"); 
+	SessionManager.getInstance().createSession("Fix ConstraintBlocks") 
 
-	recursiveEASearch($project.getPrimaryModel());
+	recursiveEASearch($project.getPrimaryModel())
 ensure
-	SessionManager.getInstance().closeSession();
+	SessionManager.getInstance().closeSession()
 end

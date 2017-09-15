@@ -16,29 +16,29 @@ SessionManager = com.nomagic.magicdraw.openapi.uml.SessionManager
 #The $root variable is set to the root package in the project
 ##
 
-$project = Application.getInstance().getProject();
-$elementsFactory = $project.getElementsFactory();
-$root = $project.getPrimaryModel();
+$project = Application.getInstance().getProject()
+$elementsFactory = $project.getElementsFactory()
+$root = $project.getPrimaryModel()
 
 ##
 #The following section finds the profiles and stereotypes used in the macro
 ##
 
-$lsstProfile = StereotypesHelper.getProfile($project,'LSST Profile');
-$sysmlProfile = StereotypesHelper.getProfile($project,'SysML');
+$lsstProfile = StereotypesHelper.getProfile($project,'LSST Profile')
+$sysmlProfile = StereotypesHelper.getProfile($project,'SysML')
                                                                                   
-$sysmlRequirementStereotype = StereotypesHelper.getStereotype($project,'Requirement',$sysmlProfile);
-$sysmlInterfaceRequirementStereotype = StereotypesHelper.getStereotype($project,'interfaceRequirement',$sysmlProfile);
+$sysmlRequirementStereotype = StereotypesHelper.getStereotype($project,'Requirement',$sysmlProfile)
+$sysmlInterfaceRequirementStereotype = StereotypesHelper.getStereotype($project,'interfaceRequirement',$sysmlProfile)
 
-$vpeStereotype = StereotypesHelper.getStereotype($project,'VerificationElement',$lsstProfile);
-$uniqueIDStubHolderStereotype = StereotypesHelper.getStereotype($project,'UniqueIDStubHolder',$lsstProfile);
+$vpeStereotype = StereotypesHelper.getStereotype($project,'VerificationElement',$lsstProfile)
+$uniqueIDStubHolderStereotype = StereotypesHelper.getStereotype($project,'UniqueIDStubHolder',$lsstProfile)
 
 ##
 #The following section creates an empty HashMap to maintain the last IDs for each ID stub and an ArrayList to hold all requirements without IDs
 ##
 
-$lastRequirements = java.util.HashMap.new;
-$unmarkedRequirements = java.util.ArrayList.new;
+$lastRequirements = java.util.HashMap.new
+$unmarkedRequirements = java.util.ArrayList.new
 
 ##
 #The following section is a method that recursively loops through the containment tree
@@ -48,20 +48,20 @@ $unmarkedRequirements = java.util.ArrayList.new;
 def getLatestIds(element)
 	if((StereotypesHelper.hasStereotype(element,$sysmlRequirementStereotype) or StereotypesHelper.hasStereotype(element,$sysmlInterfaceRequirementStereotype)) and !StereotypesHelper.hasStereotype(element,$vpeStereotype))
 		if(!StereotypesHelper.getStereotypePropertyValue(element,$sysmlRequirementStereotype,'Id').isEmpty())
-			id = StereotypesHelper.getStereotypePropertyValue(element,$sysmlRequirementStereotype,'Id').get(0);
-			pre = parsePrefix(id);
-			post = parsePostfix(id);
+			id = StereotypesHelper.getStereotypePropertyValue(element,$sysmlRequirementStereotype,'Id').get(0)
+			pre = parsePrefix(id)
+			post = parsePostfix(id)
 			if($lastRequirements.get(pre) != nil)
 				if($lastRequirements.get(pre) < post)
-					$lastRequirements.put(pre,post);
+					$lastRequirements.put(pre,post)
 				end
 			else
-				$lastRequirements.put(pre,post);
+				$lastRequirements.put(pre,post)
 			end
 		end
 	end
 	for child in element.getOwnedElement()
-    	getLatestIds(child);
+    	getLatestIds(child)
 	end
 end
 
@@ -72,11 +72,11 @@ end
 def findMissingIds(element)
 	if((StereotypesHelper.hasStereotype(element,$sysmlRequirementStereotype) or StereotypesHelper.hasStereotype(element,$sysmlInterfaceRequirementStereotype)) and !StereotypesHelper.hasStereotype(element,$vpeStereotype))
 		if(StereotypesHelper.getStereotypePropertyValue(element,$sysmlRequirementStereotype,'Id').isEmpty() or StereotypesHelper.getStereotypePropertyValue(element,$sysmlRequirementStereotype,'Id').get(0) == '')
-			$unmarkedRequirements.add(element);
+			$unmarkedRequirements.add(element)
 		end
 	end
 	for child in element.getOwnedElement()
-    	findMissingIds(child);
+    	findMissingIds(child)
 	end
 end
 
@@ -86,12 +86,12 @@ end
 
 def parsePrefix(elementId)
 
-	elementId = elementId.strip;
-	lastIndex = lastIndexOf(elementId,'-');
+	elementId = elementId.strip
+	lastIndex = lastIndexOf(elementId,'-')
 	if(lastIndex == -1 or elementId[lastIndex+1,elementId.length-1].to_i == 0)
-		return elementId;
+		return elementId
 	else
-		return elementId[0,lastIndex];
+		return elementId[0,lastIndex]
 	end
 end
 
@@ -101,12 +101,12 @@ end
 
 def parsePostfix(elementId)
 
-	elementId = elementId.strip;
-	lastIndex = lastIndexOf(elementId,'-');
+	elementId = elementId.strip
+	lastIndex = lastIndexOf(elementId,'-')
 	if(lastIndex == -1 or elementId[lastIndex+1,elementId.length-1].to_i == 0)
-		return 0;
+		return 0
 	else
-		return elementId[lastIndex+1,elementId.length-1].to_i;
+		return elementId[lastIndex+1,elementId.length-1].to_i
 	end
 end
 
@@ -115,16 +115,16 @@ end
 ##
 
 def lastIndexOf(inputString,character)
-	i = inputString.length - 1;
+	i = inputString.length - 1
 
 	while i>=0
 		if(inputString[i] == character)
-			return i;
+			return i
 		end
-		i = i - 1;
+		i = i - 1
 	end
 
-	return -1;
+	return -1
 end
 
 ##
@@ -134,33 +134,33 @@ end
 
 def fixId(element,req)
 	if(element == $root or (element.getOwner() == $root and StereotypesHelper.getStereotypePropertyValue($root,$uniqueIDStubHolderStereotype,'uniqueIDStub').isEmpty()))
-		Application.getInstance().getGUILog().log("Could not find valid prefix for: " + req.getName());
-		return;
+		Application.getInstance().getGUILog().log("Could not find valid prefix for: " + req.getName())
+		return
 	elsif(!StereotypesHelper.getStereotypePropertyValue(element.getOwner(),$uniqueIDStubHolderStereotype,'uniqueIDStub').isEmpty())
-		localId = StereotypesHelper.getStereotypePropertyValue(element.getOwner(),$uniqueIDStubHolderStereotype,'uniqueIDStub').get(0).strip;
+		localId = StereotypesHelper.getStereotypePropertyValue(element.getOwner(),$uniqueIDStubHolderStereotype,'uniqueIDStub').get(0).strip
 		if(parsePrefix(localId) == localId)
 			if($lastRequirements.get(localId) == nil)
-				nextId = 1;
+				nextId = 1
 			else
-				nextId = $lastRequirements.get(localId) + 1;
+				nextId = $lastRequirements.get(localId) + 1
 			end
 			if(nextId<10)
-				StereotypesHelper.setStereotypePropertyValue(req,$sysmlRequirementStereotype,'Id',(localId.to_s + '-000' + nextId.to_s));
+				StereotypesHelper.setStereotypePropertyValue(req,$sysmlRequirementStereotype,'Id',(localId.to_s + '-000' + nextId.to_s))
 			elsif(nextId<100)
-				StereotypesHelper.setStereotypePropertyValue(req,$sysmlRequirementStereotype,'Id',(localId.to_s + '-00' + nextId.to_s));
+				StereotypesHelper.setStereotypePropertyValue(req,$sysmlRequirementStereotype,'Id',(localId.to_s + '-00' + nextId.to_s))
 			elsif(nextId<1000)
-				StereotypesHelper.setStereotypePropertyValue(req,$sysmlRequirementStereotype,'Id',(localId.to_s + '-0' + nextId.to_s));
+				StereotypesHelper.setStereotypePropertyValue(req,$sysmlRequirementStereotype,'Id',(localId.to_s + '-0' + nextId.to_s))
 			else
-				StereotypesHelper.setStereotypePropertyValue(req,$sysmlRequirementStereotype,'Id',(localId.to_s + '-' + nextId.to_s));
+				StereotypesHelper.setStereotypePropertyValue(req,$sysmlRequirementStereotype,'Id',(localId.to_s + '-' + nextId.to_s))
 			end
-			$lastRequirements.put(localId,nextId);
-			return;
+			$lastRequirements.put(localId,nextId)
+			return
 		end
 	else
-		Application.getInstance().getGUILog().log(element.getOwner().getName());
+		Application.getInstance().getGUILog().log(element.getOwner().getName())
 	end
 
-	fixId(element.getOwner(),req);
+	fixId(element.getOwner(),req)
 end
 
 ##
@@ -169,17 +169,17 @@ end
 ##
 
 begin
-	SessionManager.getInstance().createSession("Populate_Requirement_Ids"); 
+	SessionManager.getInstance().createSession("Populate_Requirement_Ids") 
 
-	$selectedNode = Application.getInstance().getProject().getBrowser().getContainmentTree().getSelectedNode().getUserObject();
+	$selectedNode = Application.getInstance().getProject().getBrowser().getContainmentTree().getSelectedNode().getUserObject()
 
-	getLatestIds($root);
-	findMissingIds($selectedNode);
+	getLatestIds($root)
+	findMissingIds($selectedNode)
 
 	for req in $unmarkedRequirements
-		fixId(req,req);
+		fixId(req,req)
 	end
 
 ensure
-	SessionManager.getInstance().closeSession();
+	SessionManager.getInstance().closeSession()
 end

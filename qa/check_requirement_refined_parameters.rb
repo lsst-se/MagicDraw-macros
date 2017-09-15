@@ -11,12 +11,12 @@ SessionManager = com.nomagic.magicdraw.openapi.uml.SessionManager
 $project = Application.getInstance().getProject()
 $logger = Application.getInstance().getGUILog()
 
-$sysmlProfile = StereotypesHelper.getProfile($project, 'SysML');
-$lsstProfile = StereotypesHelper.getProfile($project, 'LSST Profile');
+$sysmlProfile = StereotypesHelper.getProfile($project, 'SysML')
+$lsstProfile = StereotypesHelper.getProfile($project, 'LSST Profile')
 
-$requirementStereotype = StereotypesHelper.getStereotype($project, 'Requirement', $sysmlProfile);
+$requirementStereotype = StereotypesHelper.getStereotype($project, 'Requirement', $sysmlProfile)
 $refineStereotype = StereotypesHelper.getStereotype($project, 'Refine', $sysmlProfile)
-$ceStereotype = StereotypesHelper.getStereotype($project, 'ConstraintElement', $lsstProfile);
+$ceStereotype = StereotypesHelper.getStereotype($project, 'ConstraintElement', $lsstProfile)
 
 # This function finds refining parameters via ConstraintBlocks/ConstraintElements 
 # from the given Requirement.

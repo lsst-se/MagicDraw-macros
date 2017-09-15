@@ -9,37 +9,37 @@ StereotypesHelper = com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper
 ModelHelper = com.nomagic.uml2.ext.jmi.helpers.ModelHelper
 SessionManager = com.nomagic.magicdraw.openapi.uml.SessionManager
 
-$project = Application.getInstance().getProject();
-$elementsFactory = $project.getElementsFactory();
+$project = Application.getInstance().getProject()
+$elementsFactory = $project.getElementsFactory()
 
-$sysmlProfile = StereotypesHelper.getProfile($project,'SysML');
+$sysmlProfile = StereotypesHelper.getProfile($project,'SysML')
 
-$sysmlConstraintBlockStereotype = StereotypesHelper.getStereotype($project,'ConstraintBlock',$sysmlProfile);
-$sysmlRefineStereotype = StereotypesHelper.getStereotype($project,'Refine',$sysmlProfile);
+$sysmlConstraintBlockStereotype = StereotypesHelper.getStereotype($project,'ConstraintBlock',$sysmlProfile)
+$sysmlRefineStereotype = StereotypesHelper.getStereotype($project,'Refine',$sysmlProfile)
 
-$refinesLocation = ModelHelper.findElementWithPath('Requirements::Refines Relations');
+$refinesLocation = ModelHelper.findElementWithPath('Requirements::Refines Relations')
 
-$elementsToRemove = java.util.ArrayList.new;
+$elementsToRemove = java.util.ArrayList.new
 
 def recursiveEASearch(element)
 	if(StereotypesHelper.hasStereotype(element,$sysmlConstraintBlockStereotype))
 		if(element.get_relationshipOfRelatedElement().size() == 0)
-			refines = $elementsFactory.createAbstractionInstance();
-			StereotypesHelper.addStereotype(refines,$sysmlRefineStereotype);
-			ModelHelper.setSupplierElement(refines,element.getOwner());
-			ModelHelper.setClientElement(refines,element);
-			refines.setOwner($refinesLocation);
+			refines = $elementsFactory.createAbstractionInstance()
+			StereotypesHelper.addStereotype(refines,$sysmlRefineStereotype)
+			ModelHelper.setSupplierElement(refines,element.getOwner())
+			ModelHelper.setClientElement(refines,element)
+			refines.setOwner($refinesLocation)
 		end
 	end
 	for child in element.getOwnedElement()
-    	recursiveEASearch(child);
+    	recursiveEASearch(child)
 	end
 end
 
 begin
-	SessionManager.getInstance().createSession("Fix Reqs"); 
+	SessionManager.getInstance().createSession("Fix Reqs") 
 	
-	recursiveEASearch($project.getPrimaryModel());
+	recursiveEASearch($project.getPrimaryModel())
 ensure
-	SessionManager.getInstance().closeSession();
+	SessionManager.getInstance().closeSession()
 end
