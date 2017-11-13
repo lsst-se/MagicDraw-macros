@@ -100,7 +100,8 @@ with open(sys.argv[1], "r") as fh:
             line = re.sub(r" & ", r" \& ", line)
 
         # Handle underscores that are surrounded by text
-        if re.search(r"\w_\w", line):
+        # but not bib files
+        if re.search(r"\w_\w", line) and not line.startswith("\\bibliography{"):
             line = re.sub(r"(\w)_(\w)", r"\1\_\2", line)
 
         # Sometimes traced requirements have & in their name and we have no
