@@ -145,13 +145,29 @@ $derive.getTarget().get(0).name \newline
 
 #end
 
-#foreach($subElement in $element.getOwnedElement())
-#if($report.containsStereotype($subElement,"Requirement") || $report.containsStereotype($subElement,"interfaceRequirement") || $subElement.getHumanType() == 'Package')
+## We would like packages to sort properly at lower levels, allowing numbers
+## to control the output hierarchy. If we add sorting here we also sort Requirements
+## within packages so we need to separate them and handle packages then requirements.
+## We therefore do the code twice, once for packages and once for requirements
+
+## Sort requirements (else order is essentially random and you can't use number prefixes)
+#foreach($subElement in $sorter.sort($element.getOwnedElement()))
+#if($report.containsStereotype($subElement,"Requirement") || $report.containsStereotype($subElement,"interfaceRequirement"))
 #set($depth = $depth + 1)
 #recursiveReqs($subElement,$depth)
 #set($depth = $depth - 1)
 #end
 #end
+
+## Sort packages
+#foreach($subElement in $sorter.sort($element.getOwnedElement()))
+#if($subElement.getHumanType() == 'Package')
+#set($depth = $depth + 1)
+#recursiveReqs($subElement,$depth)
+#set($depth = $depth - 1)
+#end
+#end
+
 #end
 #macro( properHeading $string $depth)
 #if($depth == 1)
