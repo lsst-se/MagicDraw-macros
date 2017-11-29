@@ -182,7 +182,7 @@ for line in document:
                     not re.search(r"ID:.*" + reqid, line):
                 print("Found internal ref to requirement {}".format(reqid), file=sys.stderr)
                 # loop through each match and replace it with latex hyperref
-                line = line.replace(reqid, r"\\hyperref[" + reqid + "]{" + reqid + "}")
+                line = line.replace(reqid, r"\hyperref[" + reqid + "]{" + reqid + "}")
 
     # Now that the line is fixed up, look for list
     if re.match(r"\s*\* ", line):
