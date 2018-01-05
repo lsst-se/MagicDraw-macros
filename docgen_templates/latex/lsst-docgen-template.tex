@@ -139,7 +139,8 @@ $refine.getSource().get(0).name
 #set($dername = $derive.getTarget().get(0).name)
 #if(!$dername.isEmpty())
 $report.getStereotypeProperty($derive.getTarget().get(0),"Requirement","Id").get(0):
-$derive.getTarget().get(0).name \newline
+#set($reqname = "$derive.getTarget().get(0).name \newline")
+#writeStrippedText($reqname)
 #end
 #end
 
@@ -197,11 +198,24 @@ $string
 ## This could all be done in the python fixup script rather than in VTL
 #macro( parseHeader $header $depth)
 #if($header.charAt(0)=='0' || $header.charAt(0)=='1' || $header.charAt(0)=='2' || $header.charAt(0)=='3' || $header.charAt(0)=='4' || $header.charAt(0)=='5' || $header.charAt(0)=='6' || $header.charAt(0)=='7' || $header.charAt(0)=='8' || $header.charAt(0)=='9')
-#properHeading($header.substring($header.indexOf(" ")),$depth)
+#set($length = $header.indexOf(" ") + 1)
+#properHeading($header.substring($length),$depth)
 #else
 #properHeading($header,$depth)
 #end
 #end
+
+## Requirement text can include numbers at start for sorting so when
+## writing a name like that it now has to be stripped
+#macro(writeStrippedText $header)
+#if($header.charAt(0)=='0' || $header.charAt(0)=='1' || $header.charAt(0)=='2' || $header.charAt(0)=='3' || $header.charAt(0)=='4' || $header.charAt(0)=='5' || $header.charAt(0)=='6' || $header.charAt(0)=='7' || $header.charAt(0)=='8' || $header.charAt(0)=='9')
+#set($length = $header.indexOf(" ") + 1)
+$header.substring($length)
+#else
+$header
+#end
+#end
+
 
 ## See if the supplied substring exists within the supplied text. If it does
 ## not then write it out ourselves. Then write the element text.
