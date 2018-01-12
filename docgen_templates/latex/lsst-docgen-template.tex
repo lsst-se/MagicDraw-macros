@@ -28,6 +28,11 @@
 #set($versions = $project.getVersionList())
 \date{$date.format('yyyy-MM-dd', $versions[0].date)}
 
+%% Allow arbitrary latex to be inserted at the end of the document.
+%% Define a new version of this command in metadata.tex. It will
+%% be run before the references are displayed.
+\newcommand{\addendum}{}
+
 %% Define the document title, authors, handle, and change record
 \input metadata.tex
 
@@ -228,6 +233,8 @@ $header
 $text
 #end
 #end
+
+\addendum
 
 \bibliography{lsst,refs_ads}
 
