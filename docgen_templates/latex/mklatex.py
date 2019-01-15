@@ -49,7 +49,7 @@ for line in document:
     # To be generically useful, we have to work out what requirement
     # ID root is being used in this document -- some documents have multiple
     # roots so we have to keep track of more than one
-    root_match = re.search("label{(.*-REQ)-\d+}", line)
+    root_match = re.search(r"label{(.*-REQ)-\d+}", line)
     if root_match:
         reqid_roots.add(root_match.group(1))
 
@@ -148,10 +148,10 @@ for line in document:
     # Newer version of model seems to put <li> tags on line of their own
     # </p> and <p> get converted to blank lines rather than skipped
     # to ensure that a paragraph boundary will really happen in latex
-    isolated_tags = {"li": "\\item", "p": ""}
+    isolated_tags = {"li": r"\\item", "p": ""}
     for t in isolated_tags:
         line = re.sub(r"^\s*<{0}>\s*$".format(t),
-                      r"{}".format(isolated_tags[t]), line)
+                      isolated_tags[t], line)
         # the end tag is stripped
         line = re.sub(r"^\s*</{0}>\s*$".format(t), "", line)
 
@@ -160,7 +160,7 @@ for line in document:
 
     # Quick search for URLs. Do not need to do anything fancy
     # until we find we do. We do not handle <a> tags.
-    line = re.sub("(?P<url>https?://[^\s,\)]+)", r"\\url{\1}", line)
+    line = re.sub(r"(?P<url>https?://[^\s,\)]+)", r"\\url{\1}", line)
 
     # Replace mentions of document handles with a citation
     # but not if this is defining the document handle itself
@@ -189,7 +189,7 @@ for line in document:
         if not in_table:
             in_table = True
             print("\\begin{itemize}")
-        line = re.sub(r"^\s*\*", r"\item", line)
+        line = re.sub(r"^\s*\*", r"\\item", line)
     elif in_table and re.match(r"^\s*$", line):
         in_table = False
         print("\\end{itemize}")
