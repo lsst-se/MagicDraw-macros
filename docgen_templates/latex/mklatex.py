@@ -103,6 +103,12 @@ for line in document:
     line = re.sub(r"<pre>", "", line)
     line = re.sub(r"</pre>", "", line)
 
+    # Sometimes a body tag turns up at the end of a line
+    line = re.sub(r"</body>$", "", line)
+
+    # A BR can be a latex newline
+    line = line.replace("<br>", r"\\" + "\n")
+
     # A </b> at the start of a line can probably be removed
     line = re.sub(r"^</b>", "", line)
 
