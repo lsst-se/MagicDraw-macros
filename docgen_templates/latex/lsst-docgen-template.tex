@@ -64,15 +64,15 @@
 \begin{document}
 \maketitle
 
-$scopedPackage.documentation
-#foreach($child in $sorter.sort($scopedPackage.getOwnedElement()))
-#if($report.containsStereotype($child,"Requirement") || $report.containsStereotype($child,"interfaceRequirement") || $child.getHumanType() == 'Package')
-#recursiveReqs($child,1)
-#end
-#end
+#recursiveReqs($scopedPackage, 0)
+
 #macro( recursiveReqs $element $depth)
 #if($element.getHumanType() == 'Package')
+
+## We do not want a title for the root element
+#if($depth != 0):
 #parseHeader($element.name,$depth)
+#end
 
 $element.documentation
 #elseif(($report.containsStereotype($element,"Requirement") || $report.containsStereotype($element,"interfaceRequirement")) && !$report.containsStereotype($element,"VerificationElement"))
